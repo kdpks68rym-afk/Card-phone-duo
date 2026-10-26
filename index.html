@@ -12,10 +12,10 @@
 <title>Magie</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
-  html, body { width: 100%; height: 100%; background: #000; overflow: hidden; touch-action: none; overscroll-behavior: none; }
-  #bg { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  #card { position: fixed; left: 50%; top: 50%; width: 60%; max-height: 70%; object-fit: contain; display: none; will-change: transform; filter: drop-shadow(0 6px 14px rgba(0,0,0,0.45)); }
-  #menu { position: fixed; inset: 0; background: rgba(0,0,0,0.94); color: #fff; display: none; flex-direction: column; align-items: center; justify-content: flex-start; gap: 16px; padding: 40px 24px; overflow-y: auto; touch-action: pan-y; font-family: -apple-system, Helvetica, Arial, sans-serif; z-index: 10; text-align: center; }
+  html, body { width: 100vw; height: 100vh; background: #000; overflow: hidden; touch-action: none; overscroll-behavior: none; position: fixed; top: 0; left: 0; }
+  #bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: fill; }
+  #card { position: fixed; left: 50%; top: 50%; width: 60vw; max-height: 90vh; object-fit: contain; display: none; will-change: transform; filter: drop-shadow(0 6px 14px rgba(0,0,0,0.45)); }
+  #menu { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.94); color: #fff; display: none; flex-direction: column; align-items: center; justify-content: flex-start; gap: 16px; padding: 40px 24px; overflow-y: auto; touch-action: pan-y; font-family: -apple-system, Helvetica, Arial, sans-serif; z-index: 10; text-align: center; }
   #menu h1 { font-size: 22px; font-weight: 600; margin-top: auto; }
   #menu .btn.ok { margin-bottom: auto; }
   #menu p { font-size: 14px; opacity: 0.7; max-width: 320px; }
@@ -26,7 +26,7 @@
   .slider-box label { display: flex; justify-content: space-between; margin-bottom: 8px; }
   .slider-box input[type=range] { width: 100%; -webkit-user-select: auto; user-select: auto; touch-action: auto; }
   input[type=file] { display: none; }
-  #perm { position: fixed; inset: 0; background: #000; color: #fff; display: none; align-items: center; justify-content: center; font-family: -apple-system, Helvetica, Arial, sans-serif; font-size: 18px; z-index: 20; text-align: center; padding: 30px; }
+  #perm { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; color: #fff; display: none; align-items: center; justify-content: center; font-family: -apple-system, Helvetica, Arial, sans-serif; font-size: 18px; z-index: 20; text-align: center; padding: 30px; }
 </style>
 </head>
 <body>
@@ -36,7 +36,7 @@
 
 <div id="menu">
   <h1>Réglages</h1>
-  <p>Choisis tes images et règle les curseurs selon ton effet.</p>
+  <p>Choisis tes images et règle les trois curseurs selon ton effet.</p>
   <label class="btn">Choisir le fond d'écran<input type="file" id="fileBg" accept="image/*"></label>
   <div class="state" id="stBg">Aucun fond choisi</div>
   <label class="btn">Choisir le PNG de la carte<input type="file" id="fileCard" accept="image/png,image/*"></label>
@@ -48,6 +48,10 @@
   <div class="slider-box">
     <label><span>Mouvement de la carte</span><span id="valMove">5</span></label>
     <input type="range" id="rngMove" min="0" max="10" step="1" value="5">
+  </div>
+  <div class="slider-box">
+    <label><span>Taille de la carte</span><span id="valSize">60</span></label>
+    <input type="range" id="rngSize" min="20" max="100" step="1" value="60">
   </div>
   <div class="btn ok" id="btnOk">Valider</div>
 </div>
@@ -96,16 +100,29 @@
   var rngMove = document.getElementById('rngMove');
   var valShake = document.getElementById('valShake');
   var valMove = document.getElementById('valMove');
+  var rngSize = document.getElementById('rngSize');
+  var valSize = document.getElementById('valSize');
 
   // Réglages par défaut (réalistes) : secousse 5, mouvement 5
   var shakeLevel = 5;
   var moveLevel = 5;
+  var sizeLevel = 60;  // largeur de la carte en % de la largeur de l'écran
   try {
     var s1 = localStorage.getItem('magie-shake');
     var s2 = localStorage.getItem('magie-move');
     if (s1 !== null) shakeLevel = parseInt(s1, 10);
+    var s3 = localStorage.getItem('magie-size');
     if (s2 !== null) moveLevel = parseInt(s2, 10);
+    if (s3 !== null) sizeLevel = parseInt(s3, 10);
   } catch (err) {}
+  rngSize.value = sizeLevel; valSize.textContent = sizeLevel;
+  card.style.width = sizeLevel + 'vw';
+  rngSize.addEventListener('input', function () {
+    sizeLevel = parseInt(rngSize.value, 10);
+    valSize.textContent = sizeLevel;
+    card.style.width = sizeLevel + 'vw';
+    try { localStorage.setItem('magie-size', sizeLevel); } catch (err) {}
+  });
   rngShake.value = shakeLevel; valShake.textContent = shakeLevel;
   rngMove.value = moveLevel; valMove.textContent = moveLevel;
 
