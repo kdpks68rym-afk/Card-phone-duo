@@ -26,12 +26,14 @@
   .slider-box { width: 280px; text-align: left; font-size: 15px; flex-shrink: 0; }
   .slider-box label { display: flex; justify-content: space-between; margin-bottom: 8px; }
   .slider-box input[type=range] { width: 100%; -webkit-user-select: auto; user-select: auto; touch-action: auto; }
+  #edge { position: fixed; top: 0; right: 0; width: 12px; height: 100vh; background-color: #000; z-index: -1; }
   input[type=file] { display: none; }
   #perm { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; color: #fff; display: none; align-items: center; justify-content: center; font-family: -apple-system, Helvetica, Arial, sans-serif; font-size: 18px; z-index: 20; text-align: center; padding: 30px; }
 </style>
 </head>
 <body>
 
+<div id='edge'></div>
 <img id='bg' alt=''>
 <img id='card' alt=''>
 
@@ -64,6 +66,9 @@
     <label><span>Gravité de la carte</span><span id='valMove'>5</span></label>
     <input type='range' id='rngMove' min='0' max='10' step='1' value='5'>
   </div>
+  <p>La bande à droite ne peut afficher qu'une seule couleur unie, pas une image.</p>
+  <div class='btn' id='btnEdgeAuto'>Couleur de la bande : auto</div>
+  <input type='color' id='edgePick' value='#000000' style='width:280px;height:44px;border:0;border-radius:14px;background:#2a2a2e;flex-shrink:0;'>
   <div class='btn' id='btnFit'>Cadrage du fond : étiré</div>
   <div class='btn ok' id='btnOk'>Valider</div>
 </div>
@@ -110,7 +115,7 @@
 
   // ---------- Réglages (mémorisés sur le téléphone) ----------
   var cfg = {
-    shake: 5, move: 5, fit: 0,
+    shake: 5, move: 5, fit: 0, edge: '',
     closed: { size: 60, invX: 0, invY: 0, swap: 0 },
     open: { size: 40, invX: 0, invY: 0, swap: 0 }
   };
@@ -120,6 +125,7 @@
       if (typeof saved.shake === 'number') cfg.shake = saved.shake;
       if (typeof saved.move === 'number') cfg.move = saved.move;
       if (typeof saved.fit === 'number') cfg.fit = saved.fit;
+      if (typeof saved.edge === 'string') cfg.edge = saved.edge;
       ['closed', 'open'].forEach(function (k) {
         if (!saved[k]) return;
         for (var p in cfg[k]) {
@@ -174,6 +180,18 @@
   // Une page web ne peut pas dessiner sous la barre d'état latérale de l'iPhone Duo.
   // iOS remplit cette zone avec la couleur de fond de la page : on la règle sur le bord droit du fond d'écran.
   var btnFit = $('btnFit');
+  var edgeEl = $('edge'), edgePick = $('edgePick'), btnEdgeAuto = $('btnEdgeAuto');
+  var autoEdge = null;
+  // Couleur de la bande : iOS prend celle du body, puis du html, et regarde aussi les éléments fixes au bord.
+  function applyEdge() {
+    var col = cfg.edge || autoEdge || '#000000';
+    document.documentElement.style.backgroundColor = col;
+    document.documentElement.style.backgroundImage = 'none';
+    document.body.style.backgroundColor = col;
+    edgeEl.style.backgroundColor = col;
+    if (cfg.edge) edgePick.value = cfg.edge;
+    btnEdgeAuto.textContent = cfg.edge ? 'Couleur choisie : toucher pour revenir en auto' : 'Couleur de la bande : auto';
+  }
   function updateEdgeColor() {
     try {
       var w = bg.naturalWidth, h = bg.naturalHeight;
@@ -190,9 +208,8 @@
         r += R; g += G; b += B;
         stops.push('rgb(' + R + ',' + G + ',' + B + ') ' + Math.round(i * 100 / 7) + '%');
       }
-      var root = document.documentElement;
-      root.style.backgroundColor = 'rgb(' + Math.round(r / 8) + ',' + Math.round(g / 8) + ',' + Math.round(b / 8) + ')';
-      root.style.backgroundImage = 'linear-gradient(to bottom, ' + stops.join(',') + ')';
+      autoEdge = 'rgb(' + Math.round(r / 8) + ',' + Math.round(g / 8) + ',' + Math.round(b / 8) + ')';
+      applyEdge();
     } catch (err) {}
   }
   bg.addEventListener('load', updateEdgeColor);
@@ -209,6 +226,7 @@
     card.style.width = c.size + 'vw';
     updToggles();
     applyFit();
+    applyEdge();
     applyImages();
   }
 
@@ -231,6 +249,8 @@
   btnInvY.addEventListener('click', function () { var c = cur(); c.invY = c.invY ? 0 : 1; updToggles(); saveCfg(); });
   btnSwap.addEventListener('click', function () { var c = cur(); c.swap = c.swap ? 0 : 1; updToggles(); saveCfg(); });
   btnFit.addEventListener('click', function () { cfg.fit = cfg.fit ? 0 : 1; applyFit(); saveCfg(); });
+  edgePick.addEventListener('input', function () { cfg.edge = edgePick.value; applyEdge(); saveCfg(); });
+  btnEdgeAuto.addEventListener('click', function () { cfg.edge = ''; applyEdge(); saveCfg(); });
 
   // ---------- Menu ----------
   function showMenu() {
