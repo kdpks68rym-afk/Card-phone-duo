@@ -26,6 +26,7 @@
   .slider-box { width: 280px; text-align: left; font-size: 15px; flex-shrink: 0; }
   .slider-box label { display: flex; justify-content: space-between; margin-bottom: 8px; }
   .slider-box input[type=range] { width: 100%; -webkit-user-select: auto; user-select: auto; touch-action: auto; }
+  #fade { position: fixed; top: 0; right: 0; height: 100vh; width: 0; pointer-events: none; }
   #edge { position: fixed; top: 0; right: 0; width: 12px; height: 100vh; background-color: #000; z-index: -1; }
   input[type=file] { display: none; }
   #perm { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; color: #fff; display: none; align-items: center; justify-content: center; font-family: -apple-system, Helvetica, Arial, sans-serif; font-size: 18px; z-index: 20; text-align: center; padding: 30px; }
@@ -35,6 +36,7 @@
 
 <div id='edge'></div>
 <img id='bg' alt=''>
+<div id='fade'></div>
 <img id='card' alt=''>
 
 <div id='menu'>
@@ -69,6 +71,10 @@
   <p>La bande à droite ne peut afficher qu'une seule couleur unie, pas une image.</p>
   <div class='btn' id='btnEdgeAuto'>Couleur de la bande : auto</div>
   <input type='color' id='edgePick' value='#000000' style='width:280px;height:44px;border:0;border-radius:14px;background:#2a2a2e;flex-shrink:0;'>
+  <div class='slider-box'>
+    <label><span>Fondu vers la bande</span><span id='valFade'>8</span></label>
+    <input type='range' id='rngFade' min='0' max='30' step='1' value='8'>
+  </div>
   <div class='btn' id='btnFit'>Cadrage du fond : étiré</div>
   <div class='btn ok' id='btnOk'>Valider</div>
 </div>
@@ -115,7 +121,7 @@
 
   // ---------- Réglages (mémorisés sur le téléphone) ----------
   var cfg = {
-    shake: 5, move: 5, fit: 0, edge: '',
+    shake: 5, move: 5, fit: 0, fade: 8, edge: '',
     closed: { size: 60, invX: 0, invY: 0, swap: 0 },
     open: { size: 40, invX: 0, invY: 0, swap: 0 }
   };
@@ -125,6 +131,7 @@
       if (typeof saved.shake === 'number') cfg.shake = saved.shake;
       if (typeof saved.move === 'number') cfg.move = saved.move;
       if (typeof saved.fit === 'number') cfg.fit = saved.fit;
+      if (typeof saved.fade === 'number') cfg.fade = saved.fade;
       if (typeof saved.edge === 'string') cfg.edge = saved.edge;
       ['closed', 'open'].forEach(function (k) {
         if (!saved[k]) return;
@@ -182,6 +189,15 @@
   var btnFit = $('btnFit');
   var edgeEl = $('edge'), edgePick = $('edgePick'), btnEdgeAuto = $('btnEdgeAuto');
   var autoEdge = null;
+  var fadeEl = $('fade');
+  // même couleur avec une transparence, pour un fondu sans teinte grise au milieu
+  function colA(c, a) {
+    if (c.charAt(0) === '#') {
+      var n = parseInt(c.slice(1), 16);
+      return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
+    }
+    return c.replace('rgb(', 'rgba(').replace(')', ',' + a + ')');
+  }
   // Couleur de la bande : iOS prend celle du body, puis du html, et regarde aussi les éléments fixes au bord.
   function applyEdge() {
     var col = cfg.edge || autoEdge || '#000000';
@@ -189,6 +205,9 @@
     document.documentElement.style.backgroundImage = 'none';
     document.body.style.backgroundColor = col;
     edgeEl.style.backgroundColor = col;
+    // fondu : le bord droit du fond d'écran se fond doucement dans la couleur de la bande
+    fadeEl.style.width = cfg.fade + 'vw';
+    fadeEl.style.background = 'linear-gradient(to right, ' + colA(col, 0) + ', ' + col + ')';
     if (cfg.edge) edgePick.value = cfg.edge;
     btnEdgeAuto.textContent = cfg.edge ? 'Couleur choisie : toucher pour revenir en auto' : 'Couleur de la bande : auto';
   }
@@ -251,6 +270,14 @@
   btnFit.addEventListener('click', function () { cfg.fit = cfg.fit ? 0 : 1; applyFit(); saveCfg(); });
   edgePick.addEventListener('input', function () { cfg.edge = edgePick.value; applyEdge(); saveCfg(); });
   btnEdgeAuto.addEventListener('click', function () { cfg.edge = ''; applyEdge(); saveCfg(); });
+  var rngFade = $('rngFade'), valFade = $('valFade');
+  rngFade.value = cfg.fade; valFade.textContent = cfg.fade;
+  rngFade.addEventListener('input', function () {
+    cfg.fade = parseInt(rngFade.value, 10);
+    valFade.textContent = cfg.fade;
+    applyEdge();
+    saveCfg();
+  });
 
   // ---------- Menu ----------
   function showMenu() {
