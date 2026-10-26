@@ -1,4 +1,4 @@
-var VERSION = 'magie-v3';
+var VERSION = 'magie-v5';
 var FILES = ['./', './index.html', './manifest.json', './icon.png'];
 
 self.addEventListener('install', function (e) {
