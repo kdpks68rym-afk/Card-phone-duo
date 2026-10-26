@@ -1,28 +1,29 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang='fr'>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Magie">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon.png">
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover'>
+<meta name='apple-mobile-web-app-capable' content='yes'>
+<meta name='mobile-web-app-capable' content='yes'>
+<meta name='apple-mobile-web-app-status-bar-style' content='black-translucent'>
+<meta name='apple-mobile-web-app-title' content='Magie'>
+<link rel='manifest' href='manifest.json'>
+<link rel='apple-touch-icon' href='icon.png'>
 <title>Magie</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
   html, body { width: 100vw; height: 100vh; background: #000; overflow: hidden; touch-action: none; overscroll-behavior: none; position: fixed; top: 0; left: 0; }
   #bg { position: fixed; top: calc(-1 * env(safe-area-inset-top, 0px)); left: calc(-1 * env(safe-area-inset-left, 0px)); width: calc(100vw + env(safe-area-inset-left, 0px) + env(safe-area-inset-right, 0px)); height: calc(100vh + env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px)); object-fit: fill; }
   #card { position: fixed; left: 50%; top: 50%; width: 60vw; max-height: 90vh; object-fit: contain; display: none; will-change: transform; filter: drop-shadow(0 6px 14px rgba(0,0,0,0.45)); }
-  #menu { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.94); color: #fff; display: none; flex-direction: column; align-items: center; justify-content: flex-start; gap: 16px; padding: 40px 24px; overflow-y: auto; touch-action: pan-y; font-family: -apple-system, Helvetica, Arial, sans-serif; z-index: 10; text-align: center; }
+  #menu { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.94); color: #fff; display: none; flex-direction: column; align-items: center; justify-content: flex-start; gap: 14px; padding: 40px 24px; overflow-y: auto; touch-action: auto; font-family: -apple-system, Helvetica, Arial, sans-serif; z-index: 10; text-align: center; }
   #menu h1 { font-size: 22px; font-weight: 600; margin-top: auto; }
   #menu .btn.ok { margin-bottom: auto; }
   #menu p { font-size: 14px; opacity: 0.7; max-width: 320px; }
-  .btn { display: block; width: 280px; padding: 16px; background: #2a2a2e; color: #fff; border-radius: 14px; font-size: 17px; text-align: center; cursor: pointer; }
+  #menu .cur { font-size: 15px; opacity: 1; color: #0a84ff; margin-top: 10px; }
+  .btn { display: block; width: 280px; padding: 14px; background: #2a2a2e; color: #fff; border-radius: 14px; font-size: 16px; text-align: center; cursor: pointer; flex-shrink: 0; }
   .btn.ok { background: #0a84ff; }
-  .state { font-size: 13px; opacity: 0.6; margin-top: -10px; }
-  .slider-box { width: 280px; text-align: left; font-size: 15px; }
+  .state { font-size: 13px; opacity: 0.6; margin-top: -8px; }
+  .slider-box { width: 280px; text-align: left; font-size: 15px; flex-shrink: 0; }
   .slider-box label { display: flex; justify-content: space-between; margin-bottom: 8px; }
   .slider-box input[type=range] { width: 100%; -webkit-user-select: auto; user-select: auto; touch-action: auto; }
   input[type=file] { display: none; }
@@ -31,47 +32,57 @@
 </head>
 <body>
 
-<img id="bg" alt="">
-<img id="card" alt="">
+<img id='bg' alt=''>
+<img id='card' alt=''>
 
-<div id="menu">
+<div id='menu'>
   <h1>Réglages</h1>
-  <p>Choisis tes images et règle les trois curseurs selon ton effet.</p>
-  <label class="btn">Choisir le fond d'écran<input type="file" id="fileBg" accept="image/*"></label>
-  <div class="state" id="stBg">Aucun fond choisi</div>
-  <label class="btn">Choisir le PNG de la carte<input type="file" id="fileCard" accept="image/png,image/*"></label>
-  <div class="state" id="stCard">Aucun PNG choisi</div>
-  <div class="slider-box">
-    <label><span>Sensibilité de la secousse</span><span id="valShake">5</span></label>
-    <input type="range" id="rngShake" min="1" max="10" step="1" value="5">
+  <p>Choisis un fond d'écran pour chaque état du téléphone, puis le PNG de la carte.</p>
+  <label class='btn'>Fond d'écran : téléphone fermé<input type='file' id='fileBgClosed' accept='image/*'></label>
+  <div class='state' id='stBgClosed'>Aucun fond choisi</div>
+  <label class='btn'>Fond d'écran : téléphone ouvert<input type='file' id='fileBgOpen' accept='image/*'></label>
+  <div class='state' id='stBgOpen'>Aucun fond choisi</div>
+  <label class='btn'>Choisir le PNG de la carte<input type='file' id='fileCard' accept='image/png,image/*'></label>
+  <div class='state' id='stCard'>Aucun PNG choisi</div>
+
+  <p class='cur' id='curState'></p>
+  <p>Ces trois réglages sont propres à l'état actuel. Ouvre ou ferme le téléphone pour régler l'autre.</p>
+  <div class='slider-box'>
+    <label><span>Taille de la carte</span><span id='valSize'>60</span></label>
+    <input type='range' id='rngSize' min='20' max='100' step='1' value='60'>
   </div>
-  <div class="slider-box">
-    <label><span>Gravité de la carte</span><span id="valMove">5</span></label>
-    <input type="range" id="rngMove" min="0" max="10" step="1" value="5">
+  <div class='btn' id='btnInvX'>Gauche / droite : normal</div>
+  <div class='btn' id='btnInvY'>Haut / bas : normal</div>
+  <div class='btn' id='btnSwap'>Axes échangés : non</div>
+
+  <p class='cur'>Réglages communs</p>
+  <div class='slider-box'>
+    <label><span>Sensibilité de la secousse</span><span id='valShake'>5</span></label>
+    <input type='range' id='rngShake' min='1' max='10' step='1' value='5'>
   </div>
-  <div class="slider-box">
-    <label><span>Taille de la carte</span><span id="valSize">60</span></label>
-    <input type="range" id="rngSize" min="20" max="100" step="1" value="60">
+  <div class='slider-box'>
+    <label><span>Gravité de la carte</span><span id='valMove'>5</span></label>
+    <input type='range' id='rngMove' min='0' max='10' step='1' value='5'>
   </div>
-  <div class="btn" id="btnInv">Sens de la gravité : normal</div>
-  <div class="btn ok" id="btnOk">Valider</div>
+  <div class='btn' id='btnFit'>Cadrage du fond : étiré</div>
+  <div class='btn ok' id='btnOk'>Valider</div>
 </div>
 
-<div id="perm">Touche l'écran pour activer les capteurs de mouvement</div>
+<div id='perm'>Touche l'écran pour activer les capteurs de mouvement</div>
 
 <script>
 (function () {
-  var bg = document.getElementById('bg');
-  var card = document.getElementById('card');
-  var menu = document.getElementById('menu');
-  var perm = document.getElementById('perm');
-  var fileBg = document.getElementById('fileBg');
-  var fileCard = document.getElementById('fileCard');
-  var stBg = document.getElementById('stBg');
-  var stCard = document.getElementById('stCard');
-  var btnOk = document.getElementById('btnOk');
+  function $(id) { return document.getElementById(id); }
+  var bg = $('bg'), card = $('card'), menu = $('menu'), perm = $('perm');
+  var fileBgClosed = $('fileBgClosed'), fileBgOpen = $('fileBgOpen'), fileCard = $('fileCard');
+  var stBgClosed = $('stBgClosed'), stBgOpen = $('stBgOpen'), stCard = $('stCard');
+  var btnOk = $('btnOk'), curState = $('curState');
+  var rngShake = $('rngShake'), valShake = $('valShake');
+  var rngMove = $('rngMove'), valMove = $('valMove');
+  var rngSize = $('rngSize'), valSize = $('valSize');
+  var btnInvX = $('btnInvX'), btnInvY = $('btnInvY'), btnSwap = $('btnSwap');
 
-  // ---------- Stockage local (IndexedDB) ----------
+  // ---------- Stockage des images (IndexedDB) ----------
   var dbp = new Promise(function (res, rej) {
     var r = indexedDB.open('magie-db', 1);
     r.onupgradeneeded = function () { r.result.createObjectStore('img'); };
@@ -97,64 +108,129 @@
     });
   }
 
-  var rngShake = document.getElementById('rngShake');
-  var rngMove = document.getElementById('rngMove');
-  var valShake = document.getElementById('valShake');
-  var valMove = document.getElementById('valMove');
-  var rngSize = document.getElementById('rngSize');
-  var valSize = document.getElementById('valSize');
-
-  // Réglages par défaut (réalistes) : secousse 5, mouvement 5
-  var shakeLevel = 5;
-  var moveLevel = 5;
-  var sizeLevel = 60;  // largeur de la carte en % de la largeur de l'écran
+  // ---------- Réglages (mémorisés sur le téléphone) ----------
+  var cfg = {
+    shake: 5, move: 5, fit: 0,
+    closed: { size: 60, invX: 0, invY: 0, swap: 0 },
+    open: { size: 40, invX: 0, invY: 0, swap: 0 }
+  };
   try {
-    var s1 = localStorage.getItem('magie-shake');
-    var s2 = localStorage.getItem('magie-move');
-    if (s1 !== null) shakeLevel = parseInt(s1, 10);
-    var s3 = localStorage.getItem('magie-size');
-    if (s2 !== null) moveLevel = parseInt(s2, 10);
-    if (s3 !== null) sizeLevel = parseInt(s3, 10);
+    var saved = JSON.parse(localStorage.getItem('magie-cfg') || 'null');
+    if (saved) {
+      if (typeof saved.shake === 'number') cfg.shake = saved.shake;
+      if (typeof saved.move === 'number') cfg.move = saved.move;
+      if (typeof saved.fit === 'number') cfg.fit = saved.fit;
+      ['closed', 'open'].forEach(function (k) {
+        if (!saved[k]) return;
+        for (var p in cfg[k]) {
+          if (typeof saved[k][p] === 'number') cfg[k][p] = saved[k][p];
+        }
+      });
+    }
   } catch (err) {}
-  rngSize.value = sizeLevel; valSize.textContent = sizeLevel;
-  card.style.width = sizeLevel + 'vw';
-  rngSize.addEventListener('input', function () {
-    sizeLevel = parseInt(rngSize.value, 10);
-    valSize.textContent = sizeLevel;
-    card.style.width = sizeLevel + 'vw';
-    try { localStorage.setItem('magie-size', sizeLevel); } catch (err) {}
-  });
-  rngShake.value = shakeLevel; valShake.textContent = shakeLevel;
-  rngMove.value = moveLevel; valMove.textContent = moveLevel;
+  function saveCfg() {
+    try { localStorage.setItem('magie-cfg', JSON.stringify(cfg)); } catch (err) {}
+  }
 
-  rngShake.addEventListener('input', function () {
-    shakeLevel = parseInt(rngShake.value, 10);
-    valShake.textContent = shakeLevel;
-    try { localStorage.setItem('magie-shake', shakeLevel); } catch (err) {}
-  });
-  rngMove.addEventListener('input', function () {
-    moveLevel = parseInt(rngMove.value, 10);
-    valMove.textContent = moveLevel;
-    try { localStorage.setItem('magie-move', moveLevel); } catch (err) {}
-  });
+  // ---------- Téléphone ouvert ou fermé ----------
+  // Écran extérieur : environ 678 points. Écran intérieur : environ 890 points.
+  var isOpenState = false;
+  function detectOpen() {
+    var longest = Math.max(screen.width || 0, screen.height || 0, window.innerWidth, window.innerHeight);
+    return longest > 780;
+  }
+  function cur() { return isOpenState ? cfg.open : cfg.closed; }
 
-  var bgBlob = null, cardBlob = null;
-  var bgURL = null, cardURL = null;
+  // ---------- Images ----------
+  var bgClosedBlob = null, bgOpenBlob = null, cardBlob = null;
+  var bgURL = null, cardURL = null, shownBg = null, shownCard = null;
 
   function applyImages() {
-    if (bgBlob) {
+    var blob = isOpenState ? (bgOpenBlob || bgClosedBlob) : (bgClosedBlob || bgOpenBlob);
+    if (blob && blob !== shownBg) {
       if (bgURL) URL.revokeObjectURL(bgURL);
-      bgURL = URL.createObjectURL(bgBlob);
+      bgURL = URL.createObjectURL(blob);
       bg.src = bgURL;
-      stBg.textContent = 'Fond d\'écran : OK';
+      shownBg = blob;
     }
-    if (cardBlob) {
+    if (cardBlob && cardBlob !== shownCard) {
       if (cardURL) URL.revokeObjectURL(cardURL);
       cardURL = URL.createObjectURL(cardBlob);
       card.src = cardURL;
-      stCard.textContent = 'PNG de la carte : OK';
+      shownCard = cardBlob;
     }
+    stBgClosed.textContent = bgClosedBlob ? 'Fond fermé : OK' : 'Aucun fond choisi';
+    stBgOpen.textContent = bgOpenBlob ? 'Fond ouvert : OK' : 'Aucun fond choisi';
+    stCard.textContent = cardBlob ? 'PNG de la carte : OK' : 'Aucun PNG choisi';
   }
+
+  function updToggles() {
+    var c = cur();
+    btnInvX.textContent = 'Gauche / droite : ' + (c.invX ? 'inversé' : 'normal');
+    btnInvY.textContent = 'Haut / bas : ' + (c.invY ? 'inversé' : 'normal');
+    btnSwap.textContent = 'Axes échangés : ' + (c.swap ? 'oui' : 'non');
+  }
+  // ---------- Bande à droite : iOS y étire la couleur de fond de la page ----------
+  // Une page web ne peut pas dessiner sous la barre d'état latérale de l'iPhone Duo.
+  // iOS remplit cette zone avec la couleur de fond de la page : on la règle sur le bord droit du fond d'écran.
+  var btnFit = $('btnFit');
+  function updateEdgeColor() {
+    try {
+      var w = bg.naturalWidth, h = bg.naturalHeight;
+      if (!w || !h) return;
+      var sw = Math.max(2, Math.round(w * 0.01));
+      var cv = document.createElement('canvas');
+      cv.width = 1; cv.height = 8;
+      var ctx = cv.getContext('2d');
+      ctx.drawImage(bg, w - sw, 0, sw, h, 0, 0, 1, 8);
+      var d = ctx.getImageData(0, 0, 1, 8).data;
+      var stops = [], r = 0, g = 0, b = 0;
+      for (var i = 0; i < 8; i++) {
+        var R = d[i * 4], G = d[i * 4 + 1], B = d[i * 4 + 2];
+        r += R; g += G; b += B;
+        stops.push('rgb(' + R + ',' + G + ',' + B + ') ' + Math.round(i * 100 / 7) + '%');
+      }
+      var root = document.documentElement;
+      root.style.backgroundColor = 'rgb(' + Math.round(r / 8) + ',' + Math.round(g / 8) + ',' + Math.round(b / 8) + ')';
+      root.style.backgroundImage = 'linear-gradient(to bottom, ' + stops.join(',') + ')';
+    } catch (err) {}
+  }
+  bg.addEventListener('load', updateEdgeColor);
+  function applyFit() {
+    bg.style.objectFit = cfg.fit ? 'cover' : 'fill';
+    bg.style.objectPosition = 'left center';
+    btnFit.textContent = 'Cadrage du fond : ' + (cfg.fit ? 'recadré à gauche' : 'étiré');
+  }
+
+  function refreshUI() {
+    var c = cur();
+    curState.textContent = 'Écran actuel : ' + (isOpenState ? 'téléphone ouvert' : 'téléphone fermé');
+    rngSize.value = c.size; valSize.textContent = c.size;
+    card.style.width = c.size + 'vw';
+    updToggles();
+    applyFit();
+    applyImages();
+  }
+
+  rngShake.value = cfg.shake; valShake.textContent = cfg.shake;
+  rngMove.value = cfg.move; valMove.textContent = cfg.move;
+  rngShake.addEventListener('input', function () {
+    cfg.shake = parseInt(rngShake.value, 10); valShake.textContent = cfg.shake; saveCfg();
+  });
+  rngMove.addEventListener('input', function () {
+    cfg.move = parseInt(rngMove.value, 10); valMove.textContent = cfg.move; saveCfg();
+  });
+  rngSize.addEventListener('input', function () {
+    var c = cur();
+    c.size = parseInt(rngSize.value, 10);
+    valSize.textContent = c.size;
+    card.style.width = c.size + 'vw';
+    saveCfg();
+  });
+  btnInvX.addEventListener('click', function () { var c = cur(); c.invX = c.invX ? 0 : 1; updToggles(); saveCfg(); });
+  btnInvY.addEventListener('click', function () { var c = cur(); c.invY = c.invY ? 0 : 1; updToggles(); saveCfg(); });
+  btnSwap.addEventListener('click', function () { var c = cur(); c.swap = c.swap ? 0 : 1; updToggles(); saveCfg(); });
+  btnFit.addEventListener('click', function () { cfg.fit = cfg.fit ? 0 : 1; applyFit(); saveCfg(); });
 
   // ---------- Menu ----------
   function showMenu() {
@@ -164,10 +240,15 @@
   function hideMenu() {
     menu.style.display = 'none';
   }
-  fileBg.addEventListener('change', function () {
-    var f = fileBg.files[0];
+  fileBgClosed.addEventListener('change', function () {
+    var f = fileBgClosed.files[0];
     if (!f) return;
-    bgBlob = f; dbSet('bg', f); applyImages();
+    bgClosedBlob = f; dbSet('bgClosed', f); applyImages();
+  });
+  fileBgOpen.addEventListener('change', function () {
+    var f = fileBgOpen.files[0];
+    if (!f) return;
+    bgOpenBlob = f; dbSet('bgOpen', f); applyImages();
   });
   fileCard.addEventListener('change', function () {
     var f = fileCard.files[0];
@@ -175,15 +256,15 @@
     cardBlob = f; dbSet('card', f); applyImages();
   });
   btnOk.addEventListener('click', function () {
-    if (!bgBlob || !cardBlob) {
-      alert('Choisis les deux images avant de valider.');
+    if (!(bgClosedBlob || bgOpenBlob) || !cardBlob) {
+      alert('Choisis au moins un fond d ecran et le PNG de la carte avant de valider.');
       return;
     }
     hideMenu();
     requestMotion();
   });
 
-  // ---------- Triple tap pour rouvrir le menu ----------
+  // ---------- Un tap fait apparaitre la carte, trois taps ouvrent le menu ----------
   var taps = [];
   var tapStart = null;
   document.addEventListener('touchstart', function (e) {
@@ -200,11 +281,11 @@
     var c = e.changedTouches[0];
     var now = Date.now();
     var moved = Math.abs(c.clientX - ts.x) + Math.abs(c.clientY - ts.y);
-    if (now - ts.time > 350 || moved > 20) return;  // ce n'est pas un simple tap
+    if (now - ts.time > 350 || moved > 20) return;
     taps.push(now);
     taps = taps.filter(function (x) { return now - x < 700; });
     if (taps.length >= 3) { taps = []; showMenu(); return; }
-    if (!cardVisible) showCard();  // un tap fait apparaitre la carte, comme une secousse
+    if (!cardVisible) showCard();
   }, { passive: true });
 
   // ---------- Capteurs de mouvement ----------
@@ -233,7 +314,7 @@
 
   // ---------- Secousse ----------
   // Niveau 1 = très difficile à déclencher, niveau 10 = très sensible
-  function shakeThreshold() { return 34 - shakeLevel * 2.2; }
+  function shakeThreshold() { return 34 - cfg.shake * 2.2; }
   var lastShake = 0;
   function onMotion(e) {
     if (menu.style.display === 'flex') return;
@@ -249,29 +330,18 @@
 
   // ---------- Carte ----------
   var cardVisible = false;
-  var tiltX = 0, tiltY = 0;
   var offX = 0, offY = 0;
   var baseGX = null, baseGY = null, rawGX = 0, rawGY = 0, gX = 0, gY = 0, velX = 0, velY = 0;
-  var invertGravity = false;
-  try { invertGravity = localStorage.getItem('magie-inv') === '1'; } catch (err) {}
-  var btnInv = document.getElementById('btnInv');
-  function updInv() { btnInv.textContent = 'Sens de la gravité : ' + (invertGravity ? 'inversé' : 'normal'); }
-  updInv();
-  btnInv.addEventListener('click', function () {
-    invertGravity = !invertGravity;
-    updInv();
-    try { localStorage.setItem('magie-inv', invertGravity ? '1' : '0'); } catch (err) {}
-  });
-  // Niveau 0 = pas de gravité, niveau 5 = réaliste, niveau 10 = la carte glisse très vite
-  function gravityForce() { return moveLevel * 220; }
+  var uiAng = null;
 
   function render() {
-    card.style.transform = 'translate(calc(-50% + ' + (offX + tiltX) + 'px), calc(-50% + ' + (offY + tiltY) + 'px))';
+    card.style.transform = 'translate(calc(-50% + ' + offX + 'px), calc(-50% + ' + offY + 'px))';
   }
   function showCard() {
     cardVisible = true;
     offX = 0; offY = 0;
     baseGX = null; baseGY = null; rawGX = 0; rawGY = 0; gX = 0; gY = 0; velX = 0; velY = 0;
+    uiAng = null;
     card.style.display = 'block';
     card.style.opacity = '0';
     card.style.transition = 'opacity 0.25s';
@@ -282,33 +352,56 @@
     cardVisible = false;
     card.style.display = 'none';
   }
+
+  // ---------- Gravité ----------
+  // On retrouve le haut et le bas de l'écran à partir de la gravité elle-même,
+  // ce qui marche aussi bien en portrait, en paysage, ouvert ou fermé.
+  function detectUiAngle(gx, gy) {
+    var landscape = window.innerWidth > window.innerHeight;
+    var ang = null;
+    try {
+      if (screen.orientation && typeof screen.orientation.angle === 'number') {
+        ang = ((screen.orientation.angle % 360) + 360) % 360;
+      }
+    } catch (err) {}
+    if (landscape) {
+      if (Math.abs(gx) > 0.3) return gx < 0 ? 90 : 270;
+      return (ang === 90 || ang === 270) ? ang : 90;
+    }
+    if (Math.abs(gy) > 0.3) return gy < 0 ? 0 : 180;
+    return (ang === 0 || ang === 180) ? ang : 0;
+  }
+  function screenGravity(e) {
+    var b = e.beta * Math.PI / 180, g = e.gamma * Math.PI / 180;
+    var gx = Math.sin(g) * Math.cos(b);
+    var gy = -Math.sin(b);
+    if (uiAng === null) uiAng = detectUiAngle(gx, gy);
+    var sx, sy;
+    if (uiAng === 90) { sx = -gy; sy = -gx; }
+    else if (uiAng === 270) { sx = gy; sy = gx; }
+    else if (uiAng === 180) { sx = -gx; sy = gy; }
+    else { sx = gx; sy = -gy; }
+    var c = cur();
+    if (c.swap) { var t = sx; sx = sy; sy = t; }
+    if (c.invX) sx = -sx;
+    if (c.invY) sy = -sy;
+    return [sx, sy];
+  }
   function onOrient(e) {
     if (!cardVisible) return;
     if (e.beta === null || e.gamma === null) return;
-    var b = e.beta * Math.PI / 180, g = e.gamma * Math.PI / 180;
-    // direction de la gravité dans le repère de l'appareil
-    var gxd = Math.sin(g) * Math.cos(b);
-    var gyd = -Math.sin(b);
-    // on la ramène dans le repère de l'écran selon l'orientation
-    var ang = 0;
-    try {
-      if (screen.orientation && typeof screen.orientation.angle === 'number') ang = screen.orientation.angle;
-      else ang = window.orientation || 0;
-    } catch (err) {}
-    ang = ((ang % 360) + 360) % 360;
-    var sxg, syg;
-    if (ang === 90) { sxg = -gyd; syg = -gxd; }
-    else if (ang === 270) { sxg = gyd; syg = gxd; }
-    else if (ang === 180) { sxg = -gxd; syg = gyd; }
-    else { sxg = gxd; syg = -gyd; }
-    if (invertGravity) { sxg = -sxg; syg = -syg; }
+    var s = screenGravity(e);
     // la position du téléphone quand la carte apparait sert de référence
-    if (baseGX === null) { baseGX = sxg; baseGY = syg; }
-    rawGX = sxg - baseGX;
-    rawGY = syg - baseGY;
+    if (baseGX === null) { baseGX = s[0]; baseGY = s[1]; }
+    rawGX = s[0] - baseGX;
+    rawGY = s[1] - baseGY;
   }
 
-  // ---------- Gravité : la carte glisse et tape sur les bords ----------
+  // Niveau 0 = pas de gravité, niveau 5 = réaliste, niveau 10 = la carte glisse très vite
+  // La force suit la taille de l'écran, donc le même niveau donne le même effet ouvert ou fermé.
+  function gravityForce() {
+    return cfg.move * 0.45 * ((window.innerWidth + window.innerHeight) / 2);
+  }
   var lastT = 0;
   function physics(t) {
     requestAnimationFrame(physics);
@@ -338,12 +431,12 @@
   requestAnimationFrame(physics);
 
   // ---------- Glisser la carte pour la sortir ----------
-  var dragging = false, sx = 0, sy = 0, startOffX = 0, startOffY = 0;
+  var dragging = false, sx0 = 0, sy0 = 0, startOffX = 0, startOffY = 0;
   card.addEventListener('touchstart', function (e) {
     if (!cardVisible) return;
     dragging = true;
     var t = e.touches[0];
-    sx = t.clientX; sy = t.clientY;
+    sx0 = t.clientX; sy0 = t.clientY;
     startOffX = offX; startOffY = offY;
     card.style.transition = 'none';
     e.preventDefault();
@@ -351,8 +444,8 @@
   document.addEventListener('touchmove', function (e) {
     if (!dragging) return;
     var t = e.touches[0];
-    offX = startOffX + (t.clientX - sx);
-    offY = startOffY + (t.clientY - sy);
+    offX = startOffX + (t.clientX - sx0);
+    offY = startOffY + (t.clientY - sy0);
     render();
     e.preventDefault();
   }, { passive: false });
@@ -369,12 +462,27 @@
     }
   });
 
+  // ---------- Plier ou déplier le téléphone ----------
+  function onResize() {
+    var o = detectOpen();
+    if (o === isOpenState) return;
+    isOpenState = o;
+    refreshUI();
+    baseGX = null; baseGY = null; uiAng = null; velX = 0; velY = 0;
+  }
+  window.addEventListener('resize', onResize);
+  window.addEventListener('orientationchange', function () { setTimeout(onResize, 300); });
+
   // ---------- Démarrage ----------
-  Promise.all([dbGet('bg'), dbGet('card')]).then(function (r) {
-    bgBlob = r[0] || null;
-    cardBlob = r[1] || null;
-    applyImages();
-    if (bgBlob && cardBlob) {
+  isOpenState = detectOpen();
+  refreshUI();
+  Promise.all([dbGet('bgClosed'), dbGet('bgOpen'), dbGet('card'), dbGet('bg')]).then(function (r) {
+    bgClosedBlob = r[0] || r[3] || null;
+    bgOpenBlob = r[1] || r[3] || null;
+    cardBlob = r[2] || null;
+    isOpenState = detectOpen();
+    refreshUI();
+    if ((bgClosedBlob || bgOpenBlob) && cardBlob) {
       hideMenu();
       requestMotion();
     } else {
